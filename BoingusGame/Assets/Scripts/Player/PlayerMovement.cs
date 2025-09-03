@@ -19,6 +19,9 @@ public class PlayerMovement : MonoBehaviour
     //Raycasts
     RaycastHit[] raycastHits = new RaycastHit[10];
 
+    //Fall speed
+    [SerializeField] private int fallSpeed = 20;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -62,7 +65,7 @@ public class PlayerMovement : MonoBehaviour
         //applying extra force to fall less floaty
         if (!isGrounded)
         {
-            playerRB.AddForce(Vector3.down * 10);
+            playerRB.AddForce(Vector3.down * fallSpeed);
         }
 
         float inputMagnitude = moveInputVector.magnitude;
