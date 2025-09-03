@@ -22,6 +22,11 @@ public class PlayerMovement : MonoBehaviour
     //Fall speed
     [SerializeField] private int fallSpeed = 20;
 
+    //Settings values
+    //inverting movement, defaulted to normal WASD
+    public int invertXAxis = 1;
+    public int invertYAxis = -1;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -72,7 +77,8 @@ public class PlayerMovement : MonoBehaviour
 
         if (inputMagnitude != 0)
         {
-            Quaternion desiredDirection = Quaternion.LookRotation(new Vector3(moveInputVector.x, 0, moveInputVector.y), transform.up);
+            Quaternion desiredDirection = Quaternion.LookRotation(new Vector3(moveInputVector.x * invertXAxis, 0, 
+                moveInputVector.y * invertYAxis), transform.up);
 
             //rotate towards direction
             playerJoint.targetRotation = Quaternion.RotateTowards(playerJoint.targetRotation, desiredDirection, Time.fixedDeltaTime * 300);
