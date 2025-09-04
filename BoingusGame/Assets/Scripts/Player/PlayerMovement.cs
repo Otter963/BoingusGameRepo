@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -11,6 +13,14 @@ public class PlayerMovement : MonoBehaviour
     //Input:
     Vector2 moveInputVector = Vector2.zero;
     bool isJumpButtonPressed = false;
+
+    //Input System
+    [SerializeField] private InputActionAsset inputActions;
+
+    private Vector2 inputMove;
+
+    private InputAction moveAction;
+    private InputAction jumpAction;
 
     //Controller settings:
     float maxSpeed = 3;
@@ -35,6 +45,20 @@ public class PlayerMovement : MonoBehaviour
     void Awake()
     {
         syncPhysicsObjects = GetComponentsInChildren<SyncPhysicsObject>();
+        moveAction = inputActions.FindActionMap("Player").FindAction("Move");
+        jumpAction = inputActions.FindActionMap("Player").FindAction("Jump");
+    }
+
+    private void OnEnable()
+    {
+        moveAction.Enable();
+        jumpAction.Enable();
+    }
+
+    private void OnDisable()
+    {
+        moveAction.Disable();
+        jumpAction.Disable();
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -50,7 +74,7 @@ public class PlayerMovement : MonoBehaviour
         moveInputVector.x = Input.GetAxis("Horizontal");
         moveInputVector.y = Input.GetAxis("Vertical");
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (jumpAction.IsPressed())
         {
             isJumpButtonPressed = true;
         }
@@ -83,7 +107,7 @@ public class PlayerMovement : MonoBehaviour
             playerRB.AddForce(Vector3.down * fallSpeed);
         }
 
-        float inputMagnitude = moveInputVector.magnitude;
+        float inputMagnitude = inputMove.magnitude;
 
         Vector3 localVelocityVsForward = transform.forward * Vector3.Dot(transform.forward, playerRB.linearVelocity);
 
@@ -91,8 +115,8 @@ public class PlayerMovement : MonoBehaviour
 
         if (inputMagnitude != 0)
         {
-            Quaternion desiredDirection = Quaternion.LookRotation(new Vector3(moveInputVector.x * invertXAxis, 0, 
-                moveInputVector.y * invertYAxis), transform.up);
+            Quaternion desiredDirection = Quaternion.LookRotation(new Vector3(inputMove.x * invertXAxis, 0, 
+                inputMove.y * invertYAxis), transform.up);
 
             //rotate towards direction
             playerJoint.targetRotation = Quaternion.RotateTowards(playerJoint.targetRotation, desiredDirection, Time.fixedDeltaTime * 300);
@@ -104,7 +128,7 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        if (isGrounded && isJumpButtonPressed)
+        if (isGrounded && jumpAction.IsPressed())
         {
             playerRB.AddForce(Vector3.up * 20, ForceMode.Impulse);
 
@@ -120,5 +144,10 @@ public class PlayerMovement : MonoBehaviour
         {
             syncPhysicsObjects[i].UpdateJointFromAnimation();
         }
+    }
+
+    public void OnMove(InputAction.CallbackContext context)
+    {
+        inputMove = context.ReadValue<Vector2>();
     }
 }
