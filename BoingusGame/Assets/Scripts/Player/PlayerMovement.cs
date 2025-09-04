@@ -77,6 +77,8 @@ public class PlayerMovement : MonoBehaviour
         if (jumpAction.IsPressed())
         {
             isJumpButtonPressed = true;
+            Jump();
+
         }
     }
 
@@ -128,13 +130,6 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        if (isGrounded && jumpAction.IsPressed())
-        {
-            playerRB.AddForce(Vector3.up * 20, ForceMode.Impulse);
-
-            isJumpButtonPressed = false;
-        }
-
         playerAnim.SetFloat("movementSpeed", localForwardVelocity * 0.4f);
 
         //animation
@@ -149,5 +144,15 @@ public class PlayerMovement : MonoBehaviour
     public void OnMove(InputAction.CallbackContext context)
     {
         inputMove = context.ReadValue<Vector2>();
+    }
+
+    public void Jump()
+    {
+        if (isGrounded && jumpAction.IsPressed() && isJumpButtonPressed)
+        {
+            playerRB.AddForce(Vector3.up * 20, ForceMode.Impulse);
+
+            isJumpButtonPressed = false;
+        }
     }
 }
