@@ -18,6 +18,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private InputActionAsset inputActions;
 
     private Vector2 inputMove;
+    private bool inputJump;
 
     private InputAction moveAction;
     private InputAction jumpAction;
@@ -74,11 +75,9 @@ public class PlayerMovement : MonoBehaviour
         moveInputVector.x = Input.GetAxis("Horizontal");
         moveInputVector.y = Input.GetAxis("Vertical");
 
-        if (jumpAction.IsPressed())
+        if (inputJump.Equals(true))
         {
             isJumpButtonPressed = true;
-            Jump();
-
         }
     }
 
@@ -146,13 +145,16 @@ public class PlayerMovement : MonoBehaviour
         inputMove = context.ReadValue<Vector2>();
     }
 
-    public void Jump()
+    public void OnJump(InputAction.CallbackContext context)
     {
-        if (isGrounded && jumpAction.IsPressed() && isJumpButtonPressed)
+        inputJump = context.ReadValueAsButton();
+
+        if (isGrounded && inputJump && isJumpButtonPressed)
         {
             playerRB.AddForce(Vector3.up * 20, ForceMode.Impulse);
 
             isJumpButtonPressed = false;
         }
+        
     }
 }
